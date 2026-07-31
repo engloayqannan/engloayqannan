@@ -17,7 +17,7 @@ import type {
  * قرار مقصود: الحقول التي تخصّ هوية صاحب الموقع وبياناته الرسمية موسومة
  * بـ [PLACEHOLDER] لأن نشرها كما هي خطأ فادح، بينما محتوى الدورات مكتوب
  * كنص واقعي بلا وسم — الغرض منه اختبار التخطيط على أطوال نص حقيقية
- * بالعربية والإنجليزية معاً، والعربية أطول بـ ١٥–٢٥٪ عادة.
+ * بالعربية والإنجليزية معاً، والعربية أطول بـ 15–25٪ عادة.
  *
  * فحص `scripts/check-placeholders.mjs` يمنع النشر مع بقاء أي وسم.
  */
@@ -67,19 +67,19 @@ export function placeholderSiteSettings(locale: Locale): SiteSettings {
     fullName: pick(locale, `${PLACEHOLDER} اسم المدرّب`, `${PLACEHOLDER} Trainer Name`),
     headline: pick(
       locale,
-      'مدرّب Front-End دولي · ١٢ سنة خبرة · محاضر جامعي',
+      'مدرّب Front-End دولي · 12 سنة خبرة · محاضر جامعي',
       'International front-end trainer · 12 years of experience · university lecturer',
     ),
     shortBio: pick(
       locale,
-      'أدرّب مهندسي الواجهات الأمامية منذ ١٢ سنة، وجاهياً وأونلاين، لأفراد وفرق هندسية في المنطقة وخارجها. أبني كل دورة حول مخرجات عملية قابلة للقياس، لا حول قائمة مواضيع.',
+      'أدرّب مهندسي الواجهات الأمامية منذ 12 سنة، وجاهياً وأونلاين، لأفراد وفرق هندسية في المنطقة وخارجها. أبني كل دورة حول مخرجات عملية قابلة للقياس، لا حول قائمة مواضيع.',
       'I have been training front-end engineers for 12 years, onsite and online, for individuals and engineering teams across the region and beyond. Every course is built around measurable, practical outcomes rather than a list of topics.',
     ),
     longBio: blocks(
       pick(
         locale,
         [
-          'بدأت مساري كمطوّر واجهات أمامية عام ٢٠١٣، وانتقلت تدريجياً من بناء المنتجات إلى بناء المهندسين الذين يبنونها. اليوم أقسم وقتي بين التدريب المؤسسي للفرق الهندسية، والدورات المفتوحة للأفراد، والمحاضرات الجامعية.',
+          'بدأت مساري كمطوّر واجهات أمامية عام 2013، وانتقلت تدريجياً من بناء المنتجات إلى بناء المهندسين الذين يبنونها. اليوم أقسم وقتي بين التدريب المؤسسي للفرق الهندسية، والدورات المفتوحة للأفراد، والمحاضرات الجامعية.',
           'منهجيتي قائمة على أن الفهم يسبق الأدوات: من يفهم كيف يعمل المتصفح ولماذا تُعاد عمليات الرسم، يتعلم أي إطار عمل جديد في أيام لا في أشهر. لذلك تبدأ كل دورة من الأساس ثم تصعد إلى الإطار، وليس العكس.',
           'درّبت حتى الآن مئات المهندسين في عدة دول، وعملت مع فرق منتجات كان عليها إصلاح أداء تطبيقات في الإنتاج تحت ضغط حقيقي — وهذه التجارب هي ما يشكّل محتوى الدورات.',
         ],
@@ -220,7 +220,7 @@ function cohortsFor(locale: Locale): Cohort[] {
       startDate: daysFromNow(21),
       endDate: daysFromNow(63),
       timezone: 'Asia/Amman',
-      schedule: pick(locale, 'الأحد والثلاثاء ١٩:٠٠–٢١:٣٠', 'Sun & Tue 19:00–21:30'),
+      schedule: pick(locale, 'الأحد والثلاثاء 19:00–21:30', 'Sun & Tue 19:00–21:30'),
       mode: 'online',
       city: null,
       capacity: 20,
@@ -235,7 +235,7 @@ function cohortsFor(locale: Locale): Cohort[] {
       startDate: daysFromNow(45),
       endDate: daysFromNow(87),
       timezone: 'Asia/Amman',
-      schedule: pick(locale, 'السبت ١٠:٠٠–١٥:٠٠', 'Saturdays 10:00–15:00'),
+      schedule: pick(locale, 'السبت 10:00–15:00', 'Saturdays 10:00–15:00'),
       mode: 'onsite',
       city: pick(locale, 'عمّان', 'Amman'),
       capacity: 14,
@@ -252,7 +252,7 @@ function cohortsFor(locale: Locale): Cohort[] {
       timezone: 'Asia/Riyadh',
       schedule: pick(
         locale,
-        'الاثنين والأربعاء ٢٠:٠٠–٢٢:٠٠',
+        'الاثنين والأربعاء 20:00–22:00',
         'Mon & Wed 20:00–22:00',
       ),
       mode: 'online',
@@ -269,7 +269,7 @@ function cohortsFor(locale: Locale): Cohort[] {
       startDate: daysFromNow(9),
       endDate: daysFromNow(37),
       timezone: 'Asia/Amman',
-      schedule: pick(locale, 'الثلاثاء والخميس ١٩:٠٠–٢١:٠٠', 'Tue & Thu 19:00–21:00'),
+      schedule: pick(locale, 'الثلاثاء والخميس 19:00–21:00', 'Tue & Thu 19:00–21:00'),
       mode: 'online',
       city: null,
       capacity: 18,
@@ -901,7 +901,7 @@ export function placeholderTestimonials(locale: Locale): Testimonial[] {
       traineeTitle: pick(locale, 'مهندسة واجهات أمامية', 'Front-end engineer'),
       courseSlug: 'react-professional',
       courseTitle: pick(locale, 'React الاحترافي', 'Professional React'),
-      cohortLabel: pick(locale, 'دفعة ربيع ٢٠٢٥', 'Spring 2025 cohort'),
+      cohortLabel: pick(locale, 'دفعة ربيع 2025', 'Spring 2025 cohort'),
       date: '2025-05-18',
       featured: true,
     },
@@ -926,7 +926,7 @@ export function placeholderTestimonials(locale: Locale): Testimonial[] {
       traineeTitle: pick(locale, 'قائد فريق تقني', 'Tech lead'),
       courseSlug: 'web-performance',
       courseTitle: pick(locale, 'أداء الويب', 'Web Performance'),
-      cohortLabel: pick(locale, 'ورشة مؤسسية ٢٠٢٥', 'Corporate workshop 2025'),
+      cohortLabel: pick(locale, 'ورشة مؤسسية 2025', 'Corporate workshop 2025'),
       date: '2025-03-02',
       featured: true,
     },
@@ -951,7 +951,7 @@ export function placeholderTestimonials(locale: Locale): Testimonial[] {
       traineeTitle: null,
       courseSlug: 'frontend-foundations',
       courseTitle: pick(locale, 'أساسيات الفرونت اند', 'Front-End Foundations'),
-      cohortLabel: pick(locale, 'دفعة خريف ٢٠٢٤', 'Autumn 2024 cohort'),
+      cohortLabel: pick(locale, 'دفعة خريف 2024', 'Autumn 2024 cohort'),
       date: '2024-12-11',
       featured: true,
     },
@@ -976,7 +976,7 @@ export function placeholderTestimonials(locale: Locale): Testimonial[] {
       traineeTitle: pick(locale, 'مطوّر ويب', 'Web developer'),
       courseSlug: 'typescript-in-depth',
       courseTitle: pick(locale, 'TypeScript بعمق', 'TypeScript in Depth'),
-      cohortLabel: pick(locale, 'دفعة صيف ٢٠٢٥', 'Summer 2025 cohort'),
+      cohortLabel: pick(locale, 'دفعة صيف 2025', 'Summer 2025 cohort'),
       date: '2025-08-04',
       featured: false,
     },
@@ -1001,7 +1001,7 @@ export function placeholderTestimonials(locale: Locale): Testimonial[] {
       traineeTitle: null,
       courseSlug: 'frontend-foundations',
       courseTitle: pick(locale, 'أساسيات الفرونت اند', 'Front-End Foundations'),
-      cohortLabel: pick(locale, 'دفعة ربيع ٢٠٢٤', 'Spring 2024 cohort'),
+      cohortLabel: pick(locale, 'دفعة ربيع 2024', 'Spring 2024 cohort'),
       date: '2024-06-22',
       featured: false,
     },
@@ -1173,7 +1173,7 @@ export function placeholderPosts(locale: Locale): Post[] {
       slug: 'teaching-fundamentals-first',
       title: pick(
         locale,
-        'لماذا أدرّس الأساسيات قبل أطر العمل — بعد ١٢ سنة تدريب',
+        'لماذا أدرّس الأساسيات قبل أطر العمل — بعد 12 سنة تدريب',
         'Why I Teach Fundamentals Before Frameworks — After 12 Years of Training',
       ),
       excerpt: pick(
@@ -1185,7 +1185,7 @@ export function placeholderPosts(locale: Locale): Post[] {
         pick(
           locale,
           [
-            'كل بضع سنوات يظهر إطار عمل جديد، ويعود السؤال نفسه: هل نبدأ بتعليمه مباشرة؟ جوابي بعد ١٢ سنة تدريب لم يتغيّر: لا.',
+            'كل بضع سنوات يظهر إطار عمل جديد، ويعود السؤال نفسه: هل نبدأ بتعليمه مباشرة؟ جوابي بعد 12 سنة تدريب لم يتغيّر: لا.',
             'المتدرّب الذي يبدأ من الإطار يتعلّم أنماطاً بلا أسباب. يعرف أن يكتب الخطاف الفلاني، ولا يعرف لماذا. وحين يتغيّر الإطار — وهو يتغيّر دائماً — يبدأ من الصفر مجدداً.',
             'المتدرّب الذي يفهم المتصفح وآلية العرض والشبكة يتعلّم أي إطار جديد في أيام، لأن الإطار عنده تفصيل تنفيذي لا صندوق أسود. هذا ليس رأياً بل نمط رأيته يتكرر في مئات المتدربين.',
           ],
