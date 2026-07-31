@@ -24,3 +24,6 @@ npm-debug.log*
 .vercel
 .idea/
 .vscode/
+
+# لقطات معاينة محلية — لا تُلتزم في المستودع
+preview/
