@@ -1,25 +1,33 @@
-import type { ReactNode } from 'react'
+import type { ComponentPropsWithoutRef, ReactNode } from 'react'
 
 import { cn } from '@/lib/utils/format'
+
+type CardElement = 'div' | 'article' | 'li' | 'section' | 'figure'
 
 export function Card({
   children,
   className,
   as: Tag = 'div',
+  ...rest
 }: {
   children: ReactNode
   className?: string
-  as?: 'div' | 'article' | 'li' | 'section' | 'figure'
-}) {
+  as?: CardElement
+} & Omit<ComponentPropsWithoutRef<'div'>, 'className' | 'children'>) {
+  // الوسم متغيّر، فلا يمكن لـ TypeScript توحيد أنواع الأحداث بين div و li؛
+  // الخصائص الممرّرة هنا سمات HTML عامة (data-* و id و aria-*) لا معالجات.
+  const Element = Tag as 'div'
+
   return (
-    <Tag
+    <Element
       className={cn(
         'rounded-md border border-border bg-surface shadow-card transition-colors duration-150',
         className,
       )}
+      {...rest}
     >
       {children}
-    </Tag>
+    </Element>
   )
 }
 

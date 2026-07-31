@@ -16,6 +16,15 @@ const buckets = new Map<string, Bucket>()
 export const RATE_LIMIT_MAX = 5
 export const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
 
+/**
+ * الحدّ الافتراضي يحمي الإنتاج. يُرفع في بيئة الاختبار فقط لأن كل
+ * الاختبارات تأتي من عنوان واحد فتصطدم ببعضها لا بالحماية.
+ */
+function configuredMax(): number {
+  const raw = Number.parseInt(process.env.RATE_LIMIT_MAX ?? '', 10)
+  return Number.isFinite(raw) && raw > 0 ? raw : RATE_LIMIT_MAX
+}
+
 export interface RateLimitResult {
   allowed: boolean
   remaining: number
@@ -24,7 +33,7 @@ export interface RateLimitResult {
 
 export function hit(
   key: string,
-  { max = RATE_LIMIT_MAX, windowMs = RATE_LIMIT_WINDOW_MS } = {},
+  { max = configuredMax(), windowMs = RATE_LIMIT_WINDOW_MS }: { max?: number; windowMs?: number } = {},
   now: number = Date.now(),
 ): RateLimitResult {
   const bucket = buckets.get(key)
@@ -58,15 +67,24 @@ export function clientKey(request: Request, scope: string): string {
   return `${scope}:${ip}`
 }
 
-/** الحد الأدنى لزمن تعبئة النموذج — الأسرع منه إرسال آلي. */
+/**
+ * حقل الشرك إشارة قاطعة: لا متصفح بشري يملؤه، فرفض الطلب آمن.
+ */
+export function isHoneypotTripped(honeypot: string | undefined): boolean {
+  return typeof honeypot === 'string' && honeypot.length > 0
+}
+
+/** الزمن الذي يُعدّ ما دونه إرسالاً سريعاً غير معتاد. */
 export const MIN_FORM_FILL_MS = 3000
 
-export function looksAutomated(
+/**
+ * السرعة إشارة ظنّية لا قاطعة: مستخدم يستعمل التعبئة التلقائية أو مدير
+ * كلمات مرور قد يرسل النموذج في ثانيتين. لذلك لا تُرفض الطلبات السريعة —
+ * تُعلَّم فقط ليراها المدرّب. فقدان تسجيل حقيقي أسوأ من مرور رسالة سبام.
+ */
+export function isSuspiciouslyFast(
   loadedAt: number | undefined,
-  honeypot: string | undefined,
   now: number = Date.now(),
 ): boolean {
-  if (honeypot && honeypot.length > 0) return true
-  if (typeof loadedAt === 'number' && now - loadedAt < MIN_FORM_FILL_MS) return true
-  return false
+  return typeof loadedAt === 'number' && now - loadedAt < MIN_FORM_FILL_MS
 }

@@ -7,7 +7,8 @@ import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionary'
 import { notifyRegistration } from '@/lib/notifications'
 import { maskEmail, maskPhone } from '@/lib/notifications/types'
-import { clientKey, hit, looksAutomated } from '@/lib/rate-limit'
+import { clientKey, hit, isHoneypotTripped, isSuspiciouslyFast } from '@/lib/rate-limit'
+import { storeInFallbackSink } from '@/lib/registrations/sink'
 import { getSanityWriteClient } from '@/lib/sanity/client'
 import { createRegistrationSchema } from '@/lib/validation/schemas'
 
@@ -63,11 +64,15 @@ export async function POST(request: Request) {
 
   const data = parsed.data
 
-  // فحوص السبام الصامتة: نعيد نجاحاً ظاهرياً حتى لا يتعلّم الآلي أي فحص أوقفه
-  if (looksAutomated(data.loadedAt, data.website)) {
-    console.warn('[register] rejected automated submission')
+  // حقل الشرك وحده يبرّر الرفض. النجاح الظاهري مقصود حتى لا يتعلّم
+  // الآلي أي فحص أوقفه.
+  if (isHoneypotTripped(data.website)) {
+    console.warn('[register] rejected honeypot submission')
     return NextResponse.json({ ok: true, whatsappSent: false, spam: true })
   }
+
+  // الإرسال السريع يُعلَّم ولا يُرفض (SPEC §7.5)
+  const suspiciouslyFast = isSuspiciouslyFast(data.loadedAt)
 
   const course = await getCourse(data.courseSlug, locale)
   if (!course) return errorResponse('course_not_found', 404)
@@ -123,6 +128,7 @@ export async function POST(request: Request) {
         locale,
         status: 'new',
         source: 'website',
+        suspectedAutomation: suspiciouslyFast,
         submittedAt: new Date().toISOString(),
       })
       persisted = true
@@ -132,6 +138,11 @@ export async function POST(request: Request) {
         error instanceof Error ? error.message : error,
       )
     }
+  }
+
+  if (!persisted) {
+    // مصرف التطوير/الاختبار، معطّل افتراضياً ولا يُفعَّل في الإنتاج
+    persisted = storeInFallbackSink(payload)
   }
 
   // ٢) الإشعارات بعدها — فشلها لا يُفشل التسجيل (SPEC §7.3 قاعدة ١)
@@ -147,10 +158,12 @@ export async function POST(request: Request) {
     phone: maskPhone(payload.phone),
     emailSent: email?.ok ?? false,
     whatsappSent: whatsapp?.ok ?? false,
+    suspiciouslyFast,
   })
 
   if (!persisted && !email?.ok) {
-    // لم يصل الطلب لأي مكان — هنا فقط يُعتبر التسجيل فاشلاً
+    // لم يصل الطلب إلى مخزن ولا إلى بريد المدرّب — يفشل بصوت عالٍ بدل
+    // أن يختفي بصمت ويظن المتدرّب أنه سجّل
     return errorResponse('server_error', 500)
   }
 

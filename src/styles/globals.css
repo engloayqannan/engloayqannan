@@ -4,69 +4,113 @@
  * رموز التصميم — الوضع الداكن هو الافتراضي (SPEC §8.2)
  * ------------------------------------------------------------------ */
 
+/* اللوحتان تُعرَّفان مرة واحدة، ثم تُربط إحداهما بالرموز الفعّالة.
+   التكرار هنا في أسطر الربط فقط لا في القيم — فلا يمكن أن ينحرف
+   الوضعان عن بعضهما عند تعديل لون. */
+
 :root {
-  --bg: #0b0f14;
-  --bg-elevated: #121821;
-  --surface: #161e29;
-  --surface-hover: #1b2532;
-  --border: #1f2a37;
-  --border-strong: #2c3a4b;
-  --text: #e6edf3;
-  --text-muted: #93a4b5;
-  --accent: #22d3ee;
-  --accent-strong: #06b6d4;
-  --accent-contrast: #04212b;
-  --accent-soft: rgb(34 211 238 / 0.12);
-  --success: #34d399;
-  --warning: #fbbf24;
-  --danger: #f87171;
-  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4);
-  --shadow-raised: 0 12px 32px -12px rgb(0 0 0 / 0.6);
+  /* اللوحة الداكنة */
+  --dark-bg: #0b0f14;
+  --dark-bg-elevated: #121821;
+  --dark-surface: #161e29;
+  --dark-surface-hover: #1b2532;
+  --dark-border: #1f2a37;
+  --dark-border-strong: #2c3a4b;
+  --dark-text: #e6edf3;
+  --dark-text-muted: #93a4b5;
+  --dark-accent: #22d3ee;
+  --dark-accent-strong: #67e8f9;
+  --dark-accent-contrast: #04212b;
+  --dark-accent-soft: rgb(34 211 238 / 0.12);
+  --dark-success: #34d399;
+  --dark-warning: #fbbf24;
+  --dark-danger: #f87171;
+  --dark-shadow-card: 0 1px 2px rgb(0 0 0 / 0.4);
+  --dark-shadow-raised: 0 12px 32px -12px rgb(0 0 0 / 0.6);
+
+  /* اللوحة الفاتحة — اللون المميّز أغمق من السماوي القياسي عمداً:
+     يُستخدم كنص صغير فوق accent-soft، و#0891b2 يرسب في 4.5:1 هناك
+     (SPEC §8.2) */
+  --light-bg: #ffffff;
+  --light-bg-elevated: #ffffff;
+  --light-surface: #f6f8fa;
+  --light-surface-hover: #eef2f6;
+  --light-border: #d8dee6;
+  --light-border-strong: #b9c3cf;
+  --light-text: #0b0f14;
+  --light-text-muted: #55606e;
+  --light-accent: #155e75;
+  --light-accent-strong: #164e63;
+  --light-accent-contrast: #ffffff;
+  --light-accent-soft: rgb(21 94 117 / 0.1);
+  --light-success: #046c4e;
+  --light-warning: #92400e;
+  --light-danger: #b91c1c;
+  --light-shadow-card: 0 1px 2px rgb(11 15 20 / 0.06);
+  --light-shadow-raised: 0 12px 32px -12px rgb(11 15 20 / 0.18);
+
+  /* الداكن هو الافتراضي */
+  --bg: var(--dark-bg);
+  --bg-elevated: var(--dark-bg-elevated);
+  --surface: var(--dark-surface);
+  --surface-hover: var(--dark-surface-hover);
+  --border: var(--dark-border);
+  --border-strong: var(--dark-border-strong);
+  --text: var(--dark-text);
+  --text-muted: var(--dark-text-muted);
+  --accent: var(--dark-accent);
+  --accent-strong: var(--dark-accent-strong);
+  --accent-contrast: var(--dark-accent-contrast);
+  --accent-soft: var(--dark-accent-soft);
+  --success: var(--dark-success);
+  --warning: var(--dark-warning);
+  --danger: var(--dark-danger);
+  --shadow-card: var(--dark-shadow-card);
+  --shadow-raised: var(--dark-shadow-raised);
   color-scheme: dark;
 }
 
-/* الوضع الفاتح — يُطبَّق باختيار صريح أو بتفضيل النظام حين لا اختيار */
-
+/* الوضع الفاتح: باختيار صريح، أو بتفضيل النظام حين لا اختيار محفوظ */
 :root[data-theme='light'] {
-  --shadow-card: 0 1px 2px rgb(11 15 20 / 0.06);
-  --shadow-raised: 0 12px 32px -12px rgb(11 15 20 / 0.18);
-  --bg: #ffffff;
-  --bg-elevated: #ffffff;
-  --surface: #f6f8fa;
-  --surface-hover: #eef2f6;
-  --border: #d8dee6;
-  --border-strong: #b9c3cf;
-  --text: #0b0f14;
-  --text-muted: #55606e;
-  --accent: #0891b2;
-  --accent-strong: #0e7490;
-  --accent-contrast: #ffffff;
-  --accent-soft: rgb(8 145 178 / 0.1);
-  --success: #047857;
-  --warning: #b45309;
-  --danger: #b91c1c;
+  --bg: var(--light-bg);
+  --bg-elevated: var(--light-bg-elevated);
+  --surface: var(--light-surface);
+  --surface-hover: var(--light-surface-hover);
+  --border: var(--light-border);
+  --border-strong: var(--light-border-strong);
+  --text: var(--light-text);
+  --text-muted: var(--light-text-muted);
+  --accent: var(--light-accent);
+  --accent-strong: var(--light-accent-strong);
+  --accent-contrast: var(--light-accent-contrast);
+  --accent-soft: var(--light-accent-soft);
+  --success: var(--light-success);
+  --warning: var(--light-warning);
+  --danger: var(--light-danger);
+  --shadow-card: var(--light-shadow-card);
+  --shadow-raised: var(--light-shadow-raised);
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: light) {
   :root:not([data-theme]) {
-    --bg: #ffffff;
-    --bg-elevated: #ffffff;
-    --surface: #f6f8fa;
-    --surface-hover: #eef2f6;
-    --border: #d8dee6;
-    --border-strong: #b9c3cf;
-    --text: #0b0f14;
-    --text-muted: #55606e;
-    --accent: #0891b2;
-    --accent-strong: #0e7490;
-    --accent-contrast: #ffffff;
-    --accent-soft: rgb(8 145 178 / 0.1);
-    --success: #047857;
-    --warning: #b45309;
-    --danger: #b91c1c;
-    --shadow-card: 0 1px 2px rgb(11 15 20 / 0.06);
-    --shadow-raised: 0 12px 32px -12px rgb(11 15 20 / 0.18);
+    --bg: var(--light-bg);
+    --bg-elevated: var(--light-bg-elevated);
+    --surface: var(--light-surface);
+    --surface-hover: var(--light-surface-hover);
+    --border: var(--light-border);
+    --border-strong: var(--light-border-strong);
+    --text: var(--light-text);
+    --text-muted: var(--light-text-muted);
+    --accent: var(--light-accent);
+    --accent-strong: var(--light-accent-strong);
+    --accent-contrast: var(--light-accent-contrast);
+    --accent-soft: var(--light-accent-soft);
+    --success: var(--light-success);
+    --warning: var(--light-warning);
+    --danger: var(--light-danger);
+    --shadow-card: var(--light-shadow-card);
+    --shadow-raised: var(--light-shadow-raised);
     color-scheme: light;
   }
 }
@@ -127,8 +171,13 @@
   }
 
   html {
-    scroll-behavior: smooth;
+    /* بلا scroll-behavior: smooth عمداً — التمرير الناعم على الجذر يؤخّر
+       التمرير البرمجي وإعادة التركيز، ويجعل العناصر تتحرك تحت إصبع
+       المستخدم على الشاشات الصغيرة. روابط المراسي تعمل بدونه. */
     -webkit-text-size-adjust: 100%;
+    /* الترويسة لاصقة بارتفاع 4rem: بدون هذا يختفي الهدف تحتها عند
+       الانتقال بمرساة أو بالتنقل بلوحة المفاتيح */
+    scroll-padding-top: 5rem;
   }
 
   body {
@@ -207,6 +256,12 @@
     .container-page {
       padding-inline: 2rem;
     }
+  }
+
+  .label-required::after {
+    content: '*';
+    margin-inline-start: 0.25rem;
+    color: var(--accent);
   }
 
   /* الأيقونات الاتجاهية تنعكس في RTL (SPEC §4.2) */

@@ -33,13 +33,13 @@ export function Field({
 
   return (
     <div className="space-y-1.5">
-      <label htmlFor={id} className="block text-xs font-semibold">
+      {/* علامة الحقل المطلوب تأتي من CSS لا من DOM: إبقاؤها خارج نص
+          التسمية يحفظ الاسم المتاح نظيفاً لقارئات الشاشة وللمحدّدات */}
+      <label
+        htmlFor={id}
+        className={cn('block text-xs font-semibold', required && 'label-required')}
+      >
         {label}
-        {required && (
-          <span aria-hidden="true" className="ms-1 text-accent">
-            *
-          </span>
-        )}
       </label>
 
       {children({

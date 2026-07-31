@@ -181,8 +181,10 @@ export function RegistrationForm({
         </div>
       )}
 
-      {/* حقل شرك مخفي عن البشر ومقروء للآلي (SPEC §7.5) */}
-      <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+      {/* حقل شرك مخفي عن البشر ومقروء للآلي (SPEC §7.5).
+          يُخفى بالقصّ لا بالإزاحة خارج الشاشة: الإزاحة السالبة تخلق
+          تمريراً أفقياً في الصفحات RTL. */}
+      <div aria-hidden="true" className="sr-only">
         <label htmlFor="website">Website</label>
         <input id="website" type="text" tabIndex={-1} autoComplete="off" {...register('website')} />
       </div>
@@ -330,10 +332,10 @@ export function RegistrationForm({
       </Field>
 
       <div className="space-y-1.5">
-        <label className="flex items-start gap-3 text-xs">
+        <label className="flex cursor-pointer items-start gap-3 py-1 text-xs">
           <input
             type="checkbox"
-            className="mt-0.5 h-4 w-4"
+            className="mt-0.5 h-5 w-5 shrink-0"
             aria-invalid={errors.consent ? true : undefined}
             aria-describedby={errors.consent ? 'consent-error' : undefined}
             {...register('consent')}

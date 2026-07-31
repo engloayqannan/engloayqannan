@@ -4,7 +4,7 @@ import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionary'
 import { sendContactEmail } from '@/lib/notifications'
 import { maskEmail } from '@/lib/notifications/types'
-import { clientKey, hit, looksAutomated } from '@/lib/rate-limit'
+import { clientKey, hit, isHoneypotTripped, isSuspiciouslyFast } from '@/lib/rate-limit'
 import { getSanityWriteClient } from '@/lib/sanity/client'
 import { createContactSchema } from '@/lib/validation/schemas'
 
@@ -44,10 +44,12 @@ export async function POST(request: Request) {
 
   const data = parsed.data
 
-  if (looksAutomated(data.loadedAt, data.website)) {
-    console.warn('[contact] rejected automated submission')
+  if (isHoneypotTripped(data.website)) {
+    console.warn('[contact] rejected honeypot submission')
     return NextResponse.json({ ok: true, spam: true })
   }
+
+  const suspiciouslyFast = isSuspiciouslyFast(data.loadedAt)
 
   const writeClient = getSanityWriteClient()
   let persisted = false
@@ -62,6 +64,7 @@ export async function POST(request: Request) {
         message: data.message,
         locale,
         status: 'new',
+        suspectedAutomation: suspiciouslyFast,
         submittedAt: new Date().toISOString(),
       })
       persisted = true
@@ -83,6 +86,7 @@ export async function POST(request: Request) {
     type: data.inquiryType,
     persisted,
     emailSent: result.ok,
+    suspiciouslyFast,
   })
 
   if (!persisted && !result.ok) {

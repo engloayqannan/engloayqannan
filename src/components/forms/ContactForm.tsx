@@ -99,7 +99,7 @@ export function ContactForm({
         </div>
       )}
 
-      <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+      <div aria-hidden="true" className="sr-only">
         <label htmlFor="contact-website">Website</label>
         <input
           id="contact-website"
