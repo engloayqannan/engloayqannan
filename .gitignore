@@ -27,3 +27,6 @@ npm-debug.log*
 
 # لقطات معاينة محلية — لا تُلتزم في المستودع
 preview/
+
+# أرشيف التسليم
+frontend-trainer-site.zip
