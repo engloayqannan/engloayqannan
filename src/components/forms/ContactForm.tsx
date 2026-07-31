@@ -5,6 +5,7 @@ import { useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { Field } from '@/components/forms/Field'
+import { TURNSTILE_SITE_KEY, Turnstile } from '@/components/forms/Turnstile'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/primitives'
 import type { Locale } from '@/lib/i18n/config'
@@ -22,6 +23,7 @@ export function ContactForm({
 }) {
   const loadedAt = useRef(Date.now())
   const [state, setState] = useState<SubmitState>({ kind: 'idle' })
+  const [turnstileToken, setTurnstileToken] = useState('')
 
   const schema = useMemo(
     () => createContactSchema(dictionary.validation),
@@ -45,7 +47,7 @@ export function ContactForm({
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...values, loadedAt: loadedAt.current }),
+        body: JSON.stringify({ ...values, loadedAt: loadedAt.current, turnstileToken }),
       })
 
       const result = (await response.json()) as {
@@ -157,7 +159,13 @@ export function ContactForm({
         {(props) => <textarea rows={6} {...props} {...register('message')} />}
       </Field>
 
-      <Button type="submit" size="lg" disabled={isSubmitting}>
+      <Turnstile onToken={setTurnstileToken} locale={locale} />
+
+      <Button
+        type="submit"
+        size="lg"
+        disabled={isSubmitting || (Boolean(TURNSTILE_SITE_KEY) && turnstileToken.length === 0)}
+      >
         {isSubmitting ? dictionary.contact.submitting : dictionary.contact.submit}
       </Button>
     </form>

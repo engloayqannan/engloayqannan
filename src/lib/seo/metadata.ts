@@ -64,14 +64,16 @@ export function buildMetadata({
       url: canonical,
       siteName,
       locale: locale === 'ar' ? 'ar_AR' : 'en_US',
-      images: ogImage ? [{ url: ogImage, width: 1200, height: 630, alt: title }] : undefined,
+      // يُحذف المفتاح تماماً عند غياب صورة صريحة — تعيينه إلى undefined
+      // يمنع Next من إدراج صورة opengraph-image المولّدة بالاصطلاح
+      ...(ogImage ? { images: [{ url: ogImage, width: 1200, height: 630, alt: title }] } : {}),
       ...(publishedTime ? { publishedTime } : {}),
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: ogImage ? [ogImage] : undefined,
+      ...(ogImage ? { images: [ogImage] } : {}),
     },
     ...(noIndex ? { robots: { index: false, follow: false } } : {}),
   }

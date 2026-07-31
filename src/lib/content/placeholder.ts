@@ -28,14 +28,31 @@ function pick<T>(locale: Locale, ar: T, en: T): T {
   return locale === 'ar' ? ar : en
 }
 
-function blocks(paragraphs: string[]): RichText {
-  return paragraphs.map((text, index) => ({
-    _type: 'block' as const,
-    _key: `block-${index}`,
-    style: 'normal' as const,
-    children: [{ _type: 'span' as const, _key: `span-${index}`, text }],
-    markDefs: [],
-  }))
+type BlockInput = string | { heading: string } | { code: string; language: string }
+
+/** يبني Portable Text من فقرات وعناوين ومقتطفات كود. */
+function blocks(items: BlockInput[]): RichText {
+  return items.map((item, index) => {
+    if (typeof item === 'object' && 'code' in item) {
+      return {
+        _type: 'code',
+        _key: `code-${index}`,
+        code: item.code,
+        language: item.language,
+      } as unknown as RichText[number]
+    }
+
+    const isHeading = typeof item === 'object' && 'heading' in item
+    const text = isHeading ? item.heading : (item as string)
+
+    return {
+      _type: 'block' as const,
+      _key: `block-${index}`,
+      style: isHeading ? ('h2' as const) : ('normal' as const),
+      children: [{ _type: 'span' as const, _key: `span-${index}`, text }],
+      markDefs: [],
+    }
+  })
 }
 
 function daysFromNow(days: number): string {
@@ -1079,13 +1096,29 @@ export function placeholderPosts(locale: Locale): Post[] {
           locale,
           [
             'حين تبني واجهة تدعم العربية والإنجليزية معاً، أول ما ينكسر هو المسافات. زر عليه margin-left يبدو صحيحاً بالإنجليزية وخاطئاً تماماً بالعربية، والحل ليس كتابة ملف CSS ثانٍ بل تغيير الخاصية نفسها.',
+            { heading: 'ما الذي تصفه الخاصية المنطقية' },
             'الخصائص المنطقية تصف المسافة بالنسبة لاتجاه القراءة لا لجهة الشاشة: margin-inline-start تعني «قبل بداية النص»، فتصبح يساراً في الإنجليزية ويميناً في العربية تلقائياً. المتصفحات تدعمها منذ سنوات، وTailwind يوفّرها بأدوات ms و me و ps و pe.',
-            'القاعدة العملية: امنع left و right في مراجعة الكود. الاستثناءات قليلة ومحددة — شعارات المنصات التي لا تنعكس، ومقتطفات الكود التي تبقى LTR دائماً.',
+            {
+              code: '.card {\n  /* ينكسر في RTL */\n  margin-left: 1rem;\n\n  /* يعمل في الاتجاهين */\n  margin-inline-start: 1rem;\n}',
+              language: 'css',
+            },
+            { heading: 'القاعدة العملية في مراجعة الكود' },
+            'امنع left و right في مراجعة الكود. الاستثناءات قليلة ومحددة — شعارات المنصات التي لا تنعكس، ومقتطفات الكود التي تبقى LTR دائماً حتى داخل فقرة عربية كهذه.',
+            { heading: 'ما لا تحلّه الخصائص المنطقية' },
+            'تبقى حالات تحتاج تدخلاً صريحاً: الأيقونات الاتجاهية كالأسهم يجب أن تنعكس بـ scaleX، والأرقام والتواريخ تحتاج قراراً واعياً حول نظام الترقيم المعروض.',
           ],
           [
             'When you build an interface that supports both Arabic and English, spacing is the first thing to break. A button with margin-left looks right in English and completely wrong in Arabic, and the fix is not a second stylesheet — it is changing the property itself.',
+            { heading: 'What a logical property actually describes' },
             'Logical properties describe spacing relative to reading direction rather than screen side: margin-inline-start means "before the start of the text", which becomes left in English and right in Arabic automatically. Browsers have supported them for years, and Tailwind exposes them as ms, me, ps, and pe.',
-            'The practical rule: ban left and right in code review. The exceptions are few and specific — platform logos that must not mirror, and code snippets that always stay LTR.',
+            {
+              code: '.card {\n  /* breaks in RTL */\n  margin-left: 1rem;\n\n  /* works in both directions */\n  margin-inline-start: 1rem;\n}',
+              language: 'css',
+            },
+            { heading: 'The rule to enforce in code review' },
+            'Ban left and right in code review. The exceptions are few and specific — platform logos that must not mirror, and code snippets that always stay LTR.',
+            { heading: 'What logical properties do not solve' },
+            'Some cases still need explicit handling: directional icons such as arrows must be mirrored with scaleX, and numbers and dates need a conscious decision about which numeral system to display.',
           ],
         ),
       ),
@@ -1112,13 +1145,21 @@ export function placeholderPosts(locale: Locale): Post[] {
           locale,
           [
             'أكثر خطأ شائع في مشاريع تحسين الأداء أن تبدأ بقائمة نصائح: اضغط الصور، أزل المكتبات، أضف تحميلاً كسولاً. النتيجة أسابيع عمل وتحسّن هامشي، لأن العنق الحقيقي كان في مكان آخر تماماً.',
-            'ابدأ ببيانات الحقل لا المختبر. Lighthouse على جهازك يقيس جهازك أنت، بينما مستخدموك على شبكات أبطأ وأجهزة أضعف. بيانات المستخدمين الحقيقيين هي التي تقول أي مقياس يعاني فعلاً.',
-            'ثم أصلح مقياساً واحداً في كل مرة، وقس بعده مباشرة. إن لم يتحرّك الرقم، تراجع عن التغيير. هذا الانضباط هو الفرق بين مشروع أداء ينجح وآخر ينتهي بجدول تغييرات بلا أثر.',
+            { heading: 'ابدأ ببيانات الحقل لا المختبر' },
+            'Lighthouse على جهازك يقيس جهازك أنت، بينما مستخدموك على شبكات أبطأ وأجهزة أضعف. بيانات المستخدمين الحقيقيين هي التي تقول أي مقياس يعاني فعلاً.',
+            { heading: 'أصلح مقياساً واحداً في كل مرة' },
+            'قس بعد كل تغيير مباشرة. إن لم يتحرّك الرقم، تراجع عن التغيير. هذا الانضباط هو الفرق بين مشروع أداء ينجح وآخر ينتهي بجدول تغييرات بلا أثر.',
+            { heading: 'ثبّت المكسب بميزانية' },
+            'التحسين بلا ميزانية مفروضة في CI يتآكل خلال أشهر. اجعل تجاوز الحد يكسر البناء، وإلا عاد الحجم إلى ما كان عليه بهدوء.',
           ],
           [
             'The most common mistake in performance work is starting from a tips list: compress images, drop libraries, add lazy loading. The result is weeks of effort and marginal gains, because the real bottleneck was somewhere else entirely.',
-            'Start with field data, not lab data. Lighthouse on your machine measures your machine, while your users are on slower networks and weaker devices. Real user data is what tells you which metric is actually suffering.',
-            'Then fix one metric at a time and measure immediately after. If the number does not move, revert the change. That discipline is the difference between a performance project that works and one that ends as a changelog with no effect.',
+            { heading: 'Start with field data, not lab data' },
+            'Lighthouse on your machine measures your machine, while your users are on slower networks and weaker devices. Real user data is what tells you which metric is actually suffering.',
+            { heading: 'Fix one metric at a time' },
+            'Measure immediately after every change. If the number does not move, revert it. That discipline is the difference between a performance project that works and one that ends as a changelog with no effect.',
+            { heading: 'Lock the win in with a budget' },
+            'An optimisation with no budget enforced in CI erodes within months. Make exceeding the limit break the build, or the size quietly returns to where it started.',
           ],
         ),
       ),

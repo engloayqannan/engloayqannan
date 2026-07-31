@@ -133,6 +133,33 @@ test.describe('التخطيط', () => {
 })
 
 test.describe('SEO', () => {
+  // بند قبول صريح: تشكيل العربية في صور المشاركة (SPEC §9.2)
+  for (const [label, path] of [
+    ['الرئيسية', ''],
+    ['صفحة دورة', '/courses/react-professional'],
+    ['مقال', '/blog/rtl-layouts-that-do-not-break'],
+  ] as const) {
+    test(`صورة مشاركة عربية تُولَّد لـ ${label}`, async ({ page, request }) => {
+      await page.goto(`/ar${path}`)
+
+      const url = await page
+        .locator('meta[property="og:image"]')
+        .first()
+        .getAttribute('content')
+
+      expect(url, 'وسم og:image مفقود').toBeTruthy()
+
+      const response = await request.get(new URL(url as string).pathname + new URL(url as string).search)
+
+      expect(response.status()).toBe(200)
+      expect(response.headers()['content-type']).toContain('image/png')
+
+      // صورة بلا خط تخرج شبه فارغة؛ الحجم المعقول دليل على رسم النص
+      const body = await response.body()
+      expect(body.byteLength).toBeGreaterThan(10_000)
+    })
+  }
+
   test('كل صفحة تحمل canonical و hreflang للغتين', async ({ page }) => {
     await page.goto('/ar/courses/react-professional')
 

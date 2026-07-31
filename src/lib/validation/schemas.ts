@@ -53,6 +53,8 @@ export function createRegistrationSchema(messages: ValidationMessages) {
       website: z.string().max(0).optional().or(z.literal('')),
       /** طابع زمني لتحميل النموذج، يكشف الإرسال الآلي السريع */
       loadedAt: z.number().int().positive().optional(),
+      /** رمز Turnstile — يُتحقق منه على الخادم حين يكون الفحص مفعّلاً */
+      turnstileToken: z.string().optional(),
     })
     .superRefine((value, ctx) => {
       if (value.preferredMode !== 'online' && !value.city?.trim()) {
@@ -99,6 +101,7 @@ export function createContactSchema(messages: ValidationMessages) {
     locale: z.enum(locales),
     website: z.string().max(0).optional().or(z.literal('')),
     loadedAt: z.number().int().positive().optional(),
+    turnstileToken: z.string().optional(),
   })
 }
 

@@ -2,10 +2,12 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { TableOfContents } from '@/components/blog/TableOfContents'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { Badge, Card, Prose } from '@/components/ui/primitives'
 import { RichText } from '@/components/ui/RichText'
 import { getPost, getPostSlugs, getPosts, getSiteSettings } from '@/lib/content'
+import { TOC_MIN_HEADINGS, extractHeadings } from '@/lib/content/headings'
 import { isLocale, locales, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionary'
 import { articleSchema, breadcrumbSchema } from '@/lib/seo/jsonld'
@@ -64,18 +66,21 @@ export default async function PostPage({
 
   if (!post) notFound()
 
+  const headings = extractHeadings(post.body)
+  const showToc = headings.length >= TOC_MIN_HEADINGS
+
   const related = allPosts
     .filter((item) => item.slug !== post.slug)
     .filter((item) => item.tags.some((tag) => post.tags.includes(tag)))
     .slice(0, 2)
 
   return (
-    <article className="container-page max-w-3xl py-16">
+    <article className="container-page py-16">
       <Link href={`/${locale}/blog`} className="text-2xs text-muted hover:text-fg">
         ← {dictionary.blog.title}
       </Link>
 
-      <header className="mt-4">
+      <header className="mt-4 max-w-3xl">
         <h1 className="text-3xl">{post.title}</h1>
 
         <div className="mt-4 flex flex-wrap items-center gap-3 text-2xs text-muted">
@@ -98,12 +103,28 @@ export default async function PostPage({
         )}
       </header>
 
-      <Prose className="mt-10 max-w-none">
-        <RichText value={post.body} />
-      </Prose>
+      <div
+        className={
+          showToc
+            ? 'mt-10 grid gap-10 lg:grid-cols-[minmax(0,48rem)_16rem] lg:items-start'
+            : 'mt-10 max-w-3xl'
+        }
+      >
+        <Prose className="max-w-none [&_pre]:my-0">
+          <RichText
+            value={post.body}
+            copyLabel={dictionary.blog.copyCode}
+            copiedLabel={dictionary.blog.codeCopied}
+          />
+        </Prose>
+
+        {showToc && (
+          <TableOfContents headings={headings} title={dictionary.blog.tableOfContents} />
+        )}
+      </div>
 
       {related.length > 0 && (
-        <section className="mt-16 border-t border-border pt-10">
+        <section className="mt-16 max-w-3xl border-t border-border pt-10">
           <h2 className="text-xl">{dictionary.blog.relatedPosts}</h2>
           <ul className="mt-5 grid gap-4 sm:grid-cols-2">
             {related.map((item) => (

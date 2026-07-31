@@ -5,6 +5,7 @@ import { getDictionary } from '@/lib/i18n/dictionary'
 import { sendContactEmail } from '@/lib/notifications'
 import { maskEmail } from '@/lib/notifications/types'
 import { clientKey, hit, isHoneypotTripped, isSuspiciouslyFast } from '@/lib/rate-limit'
+import { verifyTurnstile } from '@/lib/security/turnstile'
 import { getSanityWriteClient } from '@/lib/sanity/client'
 import { createContactSchema } from '@/lib/validation/schemas'
 
@@ -47,6 +48,16 @@ export async function POST(request: Request) {
   if (isHoneypotTripped(data.website)) {
     console.warn('[contact] rejected honeypot submission')
     return NextResponse.json({ ok: true, spam: true })
+  }
+
+  const challenge = await verifyTurnstile(
+    data.turnstileToken,
+    request.headers.get('x-forwarded-for'),
+  )
+
+  if (!challenge.ok) {
+    console.warn('[contact] turnstile rejected submission', challenge.error)
+    return NextResponse.json({ ok: false, code: 'invalid' }, { status: 400 })
   }
 
   const suspiciouslyFast = isSuspiciouslyFast(data.loadedAt)

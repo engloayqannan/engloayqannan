@@ -5,6 +5,7 @@ import { useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { Field } from '@/components/forms/Field'
+import { TURNSTILE_SITE_KEY, Turnstile } from '@/components/forms/Turnstile'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/primitives'
 import type { DeliveryMode } from '@/lib/content/types'
@@ -50,6 +51,7 @@ export function RegistrationForm({
 }: RegistrationFormProps) {
   const loadedAt = useRef(Date.now())
   const [state, setState] = useState<SubmitState>({ kind: 'idle' })
+  const [turnstileToken, setTurnstileToken] = useState('')
 
   const schema = useMemo(
     () => createRegistrationSchema(dictionary.validation),
@@ -87,7 +89,7 @@ export function RegistrationForm({
       const response = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...values, loadedAt: loadedAt.current }),
+        body: JSON.stringify({ ...values, loadedAt: loadedAt.current, turnstileToken }),
       })
 
       const result = (await response.json()) as {
@@ -363,7 +365,13 @@ export function RegistrationForm({
         )}
       </div>
 
-      <Button type="submit" size="lg" disabled={isSubmitting}>
+      <Turnstile onToken={setTurnstileToken} locale={locale} />
+
+      <Button
+        type="submit"
+        size="lg"
+        disabled={isSubmitting || (Boolean(TURNSTILE_SITE_KEY) && turnstileToken.length === 0)}
+      >
         {isSubmitting
           ? dictionary.register.submitting
           : waitlist

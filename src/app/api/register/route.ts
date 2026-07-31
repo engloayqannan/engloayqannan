@@ -8,6 +8,7 @@ import { getDictionary } from '@/lib/i18n/dictionary'
 import { notifyRegistration } from '@/lib/notifications'
 import { maskEmail, maskPhone } from '@/lib/notifications/types'
 import { clientKey, hit, isHoneypotTripped, isSuspiciouslyFast } from '@/lib/rate-limit'
+import { verifyTurnstile } from '@/lib/security/turnstile'
 import { storeInFallbackSink } from '@/lib/registrations/sink'
 import { getSanityWriteClient } from '@/lib/sanity/client'
 import { createRegistrationSchema } from '@/lib/validation/schemas'
@@ -69,6 +70,17 @@ export async function POST(request: Request) {
   if (isHoneypotTripped(data.website)) {
     console.warn('[register] rejected honeypot submission')
     return NextResponse.json({ ok: true, whatsappSent: false, spam: true })
+  }
+
+  // تحدّي Turnstile إن كان مفعّلاً — يمرّ بلا أثر حين لا تُضبط المفاتيح
+  const challenge = await verifyTurnstile(
+    data.turnstileToken,
+    request.headers.get('x-forwarded-for'),
+  )
+
+  if (!challenge.ok) {
+    console.warn('[register] turnstile rejected submission', challenge.error)
+    return errorResponse('invalid', 400)
   }
 
   // الإرسال السريع يُعلَّم ولا يُرفض (SPEC §7.5)
