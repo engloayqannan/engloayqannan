@@ -1,0 +1,244 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------ *
+ * رموز التصميم — الوضع الداكن هو الافتراضي (SPEC §8.2)
+ * ------------------------------------------------------------------ */
+
+:root {
+  --bg: #0b0f14;
+  --bg-elevated: #121821;
+  --surface: #161e29;
+  --surface-hover: #1b2532;
+  --border: #1f2a37;
+  --border-strong: #2c3a4b;
+  --text: #e6edf3;
+  --text-muted: #93a4b5;
+  --accent: #22d3ee;
+  --accent-strong: #06b6d4;
+  --accent-contrast: #04212b;
+  --accent-soft: rgb(34 211 238 / 0.12);
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-raised: 0 12px 32px -12px rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}
+
+/* الوضع الفاتح — يُطبَّق باختيار صريح أو بتفضيل النظام حين لا اختيار */
+
+:root[data-theme='light'] {
+  --shadow-card: 0 1px 2px rgb(11 15 20 / 0.06);
+  --shadow-raised: 0 12px 32px -12px rgb(11 15 20 / 0.18);
+  --bg: #ffffff;
+  --bg-elevated: #ffffff;
+  --surface: #f6f8fa;
+  --surface-hover: #eef2f6;
+  --border: #d8dee6;
+  --border-strong: #b9c3cf;
+  --text: #0b0f14;
+  --text-muted: #55606e;
+  --accent: #0891b2;
+  --accent-strong: #0e7490;
+  --accent-contrast: #ffffff;
+  --accent-soft: rgb(8 145 178 / 0.1);
+  --success: #047857;
+  --warning: #b45309;
+  --danger: #b91c1c;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --bg: #ffffff;
+    --bg-elevated: #ffffff;
+    --surface: #f6f8fa;
+    --surface-hover: #eef2f6;
+    --border: #d8dee6;
+    --border-strong: #b9c3cf;
+    --text: #0b0f14;
+    --text-muted: #55606e;
+    --accent: #0891b2;
+    --accent-strong: #0e7490;
+    --accent-contrast: #ffffff;
+    --accent-soft: rgb(8 145 178 / 0.1);
+    --success: #047857;
+    --warning: #b45309;
+    --danger: #b91c1c;
+    --shadow-card: 0 1px 2px rgb(11 15 20 / 0.06);
+    --shadow-raised: 0 12px 32px -12px rgb(11 15 20 / 0.18);
+    color-scheme: light;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * ربط الرموز بأدوات Tailwind
+ * ------------------------------------------------------------------ */
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--text);
+  --color-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-accent-soft: var(--accent-soft);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+
+  --font-sans: var(--font-latin), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+  --font-arabic: var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, 'SFMono-Regular', monospace;
+
+  /* مقياس طباعي نسبته 1.25 (SPEC §8.3) */
+  --text-2xs: 0.75rem;
+  --text-xs: 0.875rem;
+  --text-sm: 1rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5625rem;
+  --text-2xl: 1.9375rem;
+  --text-3xl: 2.4375rem;
+  --text-4xl: 3.0625rem;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+
+  --shadow-card: var(--shadow-card);
+  --shadow-raised: var(--shadow-raised);
+
+  --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ------------------------------------------------------------------ *
+ * الأساسيات
+ * ------------------------------------------------------------------ */
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-latin), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* النص العربي يحتاج تنفّساً رأسياً أكبر (SPEC §8.3) */
+  html[lang='ar'] body {
+    font-family: var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.7;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    line-height: 1.25;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* حلقة تركيز مرئية بتباين كافٍ (SPEC §10.2) */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* الكود يبقى LTR حتى داخل صفحة عربية (SPEC §4.2) */
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  /* الأرقام لاتينية في الواجهتين */
+  time,
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
+    direction: ltr;
+    unicode-bidi: isolate;
+    display: inline-block;
+  }
+
+  ::selection {
+    background-color: var(--accent-soft);
+    color: var(--text);
+  }
+}
+
+@layer utilities {
+  .container-page {
+    width: 100%;
+    margin-inline: auto;
+    max-width: 80rem;
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+
+  /* الأيقونات الاتجاهية تنعكس في RTL (SPEC §4.2) */
+  .flip-rtl {
+    transition: transform 150ms var(--ease-entrance);
+  }
+
+  [dir='rtl'] .flip-rtl {
+    transform: scaleX(-1);
+  }
+
+  .surface-grid {
+    background-image:
+      linear-gradient(to bottom, transparent, var(--bg)),
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size:
+      100% 100%,
+      64px 64px,
+      64px 64px;
+    opacity: 0.5;
+  }
+}
+
+/* احترام تقليل الحركة — غير قابل للتفاوض (SPEC §8.4) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

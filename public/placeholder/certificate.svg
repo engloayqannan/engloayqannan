@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="566" viewBox="0 0 800 566" role="img">
+  <rect width="800" height="566" fill="#f6f8fa"/>
+  <rect x="28" y="28" width="744" height="510" fill="#ffffff" stroke="#d8dee6" stroke-width="2"/>
+  <rect x="60" y="60" width="680" height="446" fill="none" stroke="#0891b2" stroke-width="3"/>
+  <text x="400" y="200" text-anchor="middle" font-size="34" font-weight="700" fill="#0b0f14" font-family="system-ui, sans-serif">CERTIFICATE</text>
+  <text x="400" y="250" text-anchor="middle" font-size="20" fill="#55606e" font-family="system-ui, sans-serif">[PLACEHOLDER] certificate image</text>
+  <line x1="240" y1="380" x2="560" y2="380" stroke="#d8dee6" stroke-width="2"/>
+  <text x="400" y="412" text-anchor="middle" font-size="16" fill="#55606e" font-family="system-ui, sans-serif">Issuing body</text>
+</svg>

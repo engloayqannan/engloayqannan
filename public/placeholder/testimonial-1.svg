@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="252" viewBox="0 0 720 252" role="img">
+  <rect width="720" height="252" rx="20" fill="#e9f3ec"/>
+  <rect x="24" y="24" width="672" height="204" rx="16" fill="#ffffff"/>
+  <circle cx="56" cy="66" r="18" fill="#22d3ee" opacity="0.25"/>
+  <text x="86" y="73" font-size="19" font-weight="600" fill="#0b0f14" font-family="system-ui, sans-serif">سارة م.</text>
+    <text x="40" y="132" font-size="21" fill="#0b0f14" font-family="system-ui, sans-serif">الدورة غيّرت طريقة تفكيري بالكامل.</text>
+    <text x="40" y="166" font-size="21" fill="#0b0f14" font-family="system-ui, sans-serif">أول مرة أفهم الـ rendering لماذا يعمل</text>
+    <text x="40" y="200" font-size="21" fill="#0b0f14" font-family="system-ui, sans-serif">هكذا وليس فقط كيف أكتبه.</text>
+  <text x="40" y="212" font-size="15" fill="#55606e" font-family="system-ui, sans-serif">[PLACEHOLDER] sample screenshot</text>
+</svg>
