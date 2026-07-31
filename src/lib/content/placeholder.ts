@@ -1099,7 +1099,9 @@ export function placeholderPosts(locale: Locale): Post[] {
             { heading: 'ما الذي تصفه الخاصية المنطقية' },
             'الخصائص المنطقية تصف المسافة بالنسبة لاتجاه القراءة لا لجهة الشاشة: margin-inline-start تعني «قبل بداية النص»، فتصبح يساراً في الإنجليزية ويميناً في العربية تلقائياً. المتصفحات تدعمها منذ سنوات، وTailwind يوفّرها بأدوات ms و me و ps و pe.',
             {
-              code: '.card {\n  /* ينكسر في RTL */\n  margin-left: 1rem;\n\n  /* يعمل في الاتجاهين */\n  margin-inline-start: 1rem;\n}',
+              // تعليقات المقتطف بالإنجليزية عمداً: الكتلة LTR قسراً، فالنص
+              // العربي داخلها يظهر بترتيب كلمات معكوس
+              code: '.card {\n  /* breaks in RTL */\n  margin-left: 1rem;\n\n  /* works in both directions */\n  margin-inline-start: 1rem;\n}',
               language: 'css',
             },
             { heading: 'القاعدة العملية في مراجعة الكود' },
