@@ -46,6 +46,8 @@ export function createRegistrationSchema(messages: ValidationMessages) {
       companyName: z.string().trim().max(120).optional().or(z.literal('')),
       notes: z.string().trim().max(1000, messages.notesTooLong).optional().or(z.literal('')),
       consent: z.literal(true, { message: messages.consentRequired }),
+      /** طلب انضمام لقائمة انتظار دفعة ممتلئة بدل تسجيل مباشر */
+      waitlist: z.boolean().optional(),
       locale: z.enum(locales),
       /** حقل شرك للسبام — يجب أن يبقى فارغاً (SPEC §7.5) */
       website: z.string().max(0).optional().or(z.literal('')),

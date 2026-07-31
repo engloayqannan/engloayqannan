@@ -83,7 +83,13 @@ export async function POST(request: Request) {
   // التحقق من التوافر لحظة الإرسال لا لحظة عرض الصفحة — الدفعة قد تكون
   // امتلأت أثناء تعبئة النموذج (SPEC §7.1)
   const availability = resolveCohortAvailability(cohort)
-  if (!availability.canRegister) {
+
+  // قائمة الانتظار مسار منفصل: مسموح على الدفعات الممتلئة وحدها، لا على
+  // المغلقة ولا على المفتوحة (تلك تُسجَّل مباشرة)
+  const wantsWaitlist = data.waitlist === true
+  const allowed = wantsWaitlist ? availability.status === 'full' : availability.canRegister
+
+  if (!allowed) {
     return errorResponse('cohort_unavailable', 409)
   }
 
@@ -126,7 +132,7 @@ export async function POST(request: Request) {
         companyName: payload.companyName,
         notes: payload.notes,
         locale,
-        status: 'new',
+        status: wantsWaitlist ? 'waitlist' : 'new',
         source: 'website',
         suspectedAutomation: suspiciouslyFast,
         submittedAt: new Date().toISOString(),
@@ -153,6 +159,7 @@ export async function POST(request: Request) {
   console.info('[register] processed', {
     registrationId: payload.registrationId,
     course: course.slug,
+    waitlist: wantsWaitlist,
     persisted,
     email: maskEmail(payload.email),
     phone: maskPhone(payload.phone),
@@ -171,5 +178,6 @@ export async function POST(request: Request) {
     ok: true,
     registrationId: payload.registrationId,
     whatsappSent: whatsapp?.ok ?? false,
+    waitlist: wantsWaitlist,
   })
 }

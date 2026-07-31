@@ -104,13 +104,21 @@ export async function CohortsPanel({
                   {dictionary.course.register}
                 </Button>
               ) : (
-                <Button href={`/${locale}/contact`} size="sm" variant="secondary">
-                  {availability.status === 'full'
-                    ? dictionary.course.joinWaitlist
-                    : availability.status === 'soon'
+                availability.status === 'full' ? (
+                  <Button
+                    href={`/${locale}/courses/${slug}/register?cohort=${cohort.id}&waitlist=1`}
+                    size="sm"
+                    variant="secondary"
+                  >
+                    {dictionary.course.joinWaitlist}
+                  </Button>
+                ) : (
+                  <Button href={`/${locale}/contact`} size="sm" variant="secondary">
+                    {availability.status === 'soon'
                       ? dictionary.course.notifyMe
                       : dictionary.course.registrationClosed}
-                </Button>
+                  </Button>
+                )
               )}
             </div>
           </li>

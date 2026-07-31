@@ -68,7 +68,7 @@
 | الإطار | Next.js 15 — App Router، React Server Components | SSG/ISR، SEO ممتاز، i18n عبر segment ديناميكي |
 | اللغة | TypeScript (strict) | أمان الأنواع عبر طبقة البيانات والترجمات |
 | التنسيق | Tailwind CSS v4 (CSS-first config) | خصائص منطقية جاهزة (`ms-`, `pe-`, `start-`) = RTL بلا جهد إضافي |
-| المحتوى | Sanity v3 + GROQ + `next-sanity` | تعريب على مستوى الحقل، Studio مدمج، ISR عبر webhook |
+| المحتوى | Sanity v3 + GROQ + `@sanity/client` | تعريب على مستوى الحقل، Studio مدمج، ISR عبر webhook. **لا يُستورد من جذر `next-sanity`** (§10.1) |
 | النماذج | React Hook Form + Zod (نفس المخطط على العميل والخادم) | تحقق موحّد، رسائل خطأ مترجمة |
 | البريد | Resend + React Email | قوالب بريد بالعربية RTL والإنجليزية |
 | الواتساب | WhatsApp Cloud API (Graph API v21+) | تأكيد تلقائي بقوالب معتمدة |
@@ -82,7 +82,7 @@
 .
 ├── src/
 │   ├── app/
-│   │   ├── [locale]/                    # ar | en
+│   │   ├── (site)/[locale]/             # ar | en — جذر تخطيط الموقع
 │   │   │   ├── layout.tsx               # يضبط lang/dir والخطوط
 │   │   │   ├── page.tsx                 # الرئيسية
 │   │   │   ├── about/page.tsx
@@ -102,7 +102,7 @@
 │   │   │   ├── register/route.ts        # تسجيل في دورة
 │   │   │   ├── contact/route.ts         # نموذج تواصل عام
 │   │   │   └── revalidate/route.ts      # webhook من Sanity
-│   │   ├── studio/[[...tool]]/page.tsx  # Sanity Studio
+│   │   ├── (studio)/studio/[[...tool]]/ # Sanity Studio — جذر تخطيط مستقل
 │   │   ├── sitemap.ts
 │   │   ├── robots.ts
 │   │   └── opengraph-image.tsx          # + نسخ لكل مسار
@@ -455,9 +455,13 @@ interface Notifier {
 
 ### ٨.٥ مكتبة المكوّنات
 
-`Button` (primary/secondary/ghost/danger × sm/md/lg) · `Card` · `Badge` · `Tag` · `Input`/`Textarea`/`Select`/`Checkbox` (مع حالات خطأ ورسائل مرتبطة بـ `aria-describedby`) · `Accordion` (منهج الدورة، الأسئلة) · `Dialog`/`Lightbox` · `Tabs` · `Breadcrumbs` · `Pagination` · `Skeleton` · `Toast` · `EmptyState` · `LocaleSwitcher` · `ThemeToggle` · `CodeBlock` · `StatCounter` · `TimelineItem`.
+`Button` (primary/secondary/ghost/danger × sm/md/lg) · `Card` · `Badge` · `Tag` · `Input`/`Textarea`/`Select`/`Checkbox` (مع حالات خطأ ورسائل مرتبطة بـ `aria-describedby`) · `Accordion` (منهج الدورة والأسئلة — عنصر `<details>` الأصلي) · `Lightbox` (عنصر `<dialog>` الأصلي) · `Tabs` · `Breadcrumbs` · `Pagination` · `Skeleton` · `Toast` · `EmptyState` · `LocaleSwitcher` · `ThemeToggle` · `CodeBlock` · `StatCounter` · `TimelineItem`.
 
-يُبنى ما يحتاج سلوك a11y معقّداً (Dialog, Accordion, Tabs, Select) على **Radix UI** — لا تُعاد كتابة إدارة التركيز وحصره يدوياً.
+**تصحيح بعد التنفيذ:** كانت الخطة بناء العناصر التفاعلية على **Radix UI**.
+عملياً غطّت عناصر المنصة الأصلية (`<details>` و `<dialog>`) كل ما احتجناه:
+حصر التركيز والإغلاق بـ Esc وإعادة التركيز إلى المصدر يوفّرها المتصفح،
+بكلفة صفر بايت بدل ١٥ كيلوبايت. يبقى Radix الخيار الصحيح لأي عنصر لا
+يوجد له مقابل أصلي (Combobox، Tabs بسلوك لوحة مفاتيح كامل).
 
 ---
 
@@ -502,8 +506,27 @@ interface Notifier {
 | LCP | ≤ 2.0 ث (4G) |
 | CLS | ≤ 0.05 |
 | INP | ≤ 200 مللي ثانية |
-| JS أولي (مضغوط) | ≤ 110 KB |
+| JS أولي (مضغوط) | ≤ 135 KB — انظر التصحيح أدناه |
 | Lighthouse (الأربعة) | ≥ 95 |
+
+> **تصحيح بعد القياس (٢٠٢٦-٠٧-٣١):** الرقم الأصلي في هذه المواصفة كان
+> ١١٠ كيلوبايت، وقد وُضع قبل البناء. القياس الفعلي بيّن أن أرضية المكدّس
+> وحدها ١٠٧٫٥ كيلوبايت مضغوطة (React 19 مع زمن تشغيل App Router)، أي أن
+> الميزانية الأصلية تترك ٢٫٥ كيلوبايت لكل كود التطبيق — وهي غير قابلة
+> للتحقيق دون تغيير الإطار. الميزانية المعتمدة الآن **١٣٥ كيلوبايت**،
+> وتُفرَض آلياً بـ `npm run check:bundle` في CI على ما يحمّله كل مسار فعلاً.
+>
+> القياسات الحالية: الصفحات المحتوائية ١٠٧–١١٠، صفحة الشهادات ١٠٧،
+> صفحتا النموذجين ١٢٩–١٣٠ (react-hook-form و zod و resolvers — كلفة
+> مقصودة مقابل مخطط تحقق واحد يعمل على العميل والخادم).
+>
+> انحداران حقيقيان أُوقفا بهذا الفحص:
+> - استيراد من جذر `next-sanity` كان يسحب مكوّنات المعاينة المباشرة إلى
+>   المتصفح ويضيف **١٠٤ كيلوبايت مضغوطة إلى كل صفحة**. الحل: الاستيراد
+>   من `@sanity/client` مباشرة.
+> - عارض صور الشهادات كان مبنياً على Radix Dialog بكلفة ١٥ كيلوبايت.
+>   الحل: عنصر `<dialog>` الأصلي، والمتصفح يوفّر حصر التركيز والإغلاق
+>   بـ Esc وإعادة التركيز مجاناً.
 
 **الوسائل:** RSC افتراضياً و`"use client"` عند الحاجة فقط · `next/image` بأبعاد صريحة و AVIF/WebP · `next/font` self-hosted · تحميل كسول لعارض الصور ومشغّلات الفيديو · تقييد `framer-motion` على المكوّنات التي تحتاجه فعلاً · تحليل الحزمة عبر `@next/bundle-analyzer` في CI.
 

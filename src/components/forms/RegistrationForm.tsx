@@ -28,6 +28,8 @@ interface RegistrationFormProps {
   cohorts: CohortOption[]
   defaultCohortId: string | null
   whatsappNumber: string
+  /** وضع قائمة الانتظار: الدفعة ممتلئة والطلب حجز مكان لا تسجيل */
+  waitlist?: boolean
 }
 
 type SubmitState =
@@ -44,6 +46,7 @@ export function RegistrationForm({
   cohorts,
   defaultCohortId,
   whatsappNumber,
+  waitlist = false,
 }: RegistrationFormProps) {
   const loadedAt = useRef(Date.now())
   const [state, setState] = useState<SubmitState>({ kind: 'idle' })
@@ -68,6 +71,7 @@ export function RegistrationForm({
       registrationType: 'individual',
       experienceLevel: 'beginner',
       locale,
+      waitlist,
       website: '',
     },
   })
@@ -126,7 +130,7 @@ export function RegistrationForm({
   if (state.kind === 'success') {
     // المسار البديل: حين لا يكون إرسال الواتساب التلقائي مفعّلاً، يرسل
     // المتدرّب التفاصيل بنفسه برسالة معبّأة (SPEC §7.4)
-    const whatsappLink = state.whatsappSent
+    const whatsappLink = state.whatsappSent || waitlist
       ? null
       : buildWhatsAppLink(
           whatsappNumber,
@@ -138,8 +142,16 @@ export function RegistrationForm({
     return (
       <Card className="p-8" data-testid="registration-success">
         <div role="status" aria-live="polite">
-          <h2 className="text-xl">{dictionary.register.successTitle}</h2>
-          <p className="mt-3 text-sm text-muted">{dictionary.register.successBody}</p>
+          <h2 className="text-xl">
+            {waitlist
+              ? dictionary.register.waitlistSuccessTitle
+              : dictionary.register.successTitle}
+          </h2>
+          <p className="mt-3 text-sm text-muted">
+            {waitlist
+              ? dictionary.register.waitlistSuccessBody
+              : dictionary.register.successBody}
+          </p>
         </div>
 
         <dl className="mt-6 space-y-2 border-t border-border pt-5 text-sm">
@@ -340,7 +352,9 @@ export function RegistrationForm({
             aria-describedby={errors.consent ? 'consent-error' : undefined}
             {...register('consent')}
           />
-          <span className="text-muted">{dictionary.register.consent}</span>
+          <span className="text-muted">
+            {waitlist ? dictionary.register.waitlistConsent : dictionary.register.consent}
+          </span>
         </label>
         {errors.consent && (
           <p id="consent-error" className="text-2xs font-semibold text-danger">
@@ -350,7 +364,11 @@ export function RegistrationForm({
       </div>
 
       <Button type="submit" size="lg" disabled={isSubmitting}>
-        {isSubmitting ? dictionary.register.submitting : dictionary.register.submit}
+        {isSubmitting
+          ? dictionary.register.submitting
+          : waitlist
+            ? dictionary.register.waitlistSubmit
+            : dictionary.register.submit}
       </Button>
     </form>
   )

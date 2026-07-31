@@ -6,7 +6,7 @@ import { RegistrationForm, type CohortOption } from '@/components/forms/Registra
 import { EmptyState } from '@/components/ui/primitives'
 import { Button } from '@/components/ui/Button'
 import { getCourse, getSiteSettings } from '@/lib/content'
-import { registrableCohorts } from '@/lib/courses/cohort-status'
+import { registrableCohorts, resolveCohortAvailability } from '@/lib/courses/cohort-status'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { getDictionary } from '@/lib/i18n/dictionary'
 import { buildMetadata } from '@/lib/seo/metadata'
@@ -58,7 +58,13 @@ export default async function RegisterPage({
   const [course, settings] = await Promise.all([getCourse(slug, locale), getSiteSettings(locale)])
   if (!course) notFound()
 
-  const available = registrableCohorts(course.cohorts)
+  // وضع قائمة الانتظار يعرض الدفعات الممتلئة وحدها؛ الوضع العادي يعرض
+  // المتاحة وحدها. لا تختلط الحالتان في قائمة واحدة (SPEC §5.4)
+  const waitlistMode = (Array.isArray(query.waitlist) ? query.waitlist[0] : query.waitlist) === '1'
+
+  const available = waitlistMode
+    ? course.cohorts.filter((cohort) => resolveCohortAvailability(cohort).status === 'full')
+    : registrableCohorts(course.cohorts)
 
   const options: CohortOption[] = available.map((cohort) => ({
     id: cohort.id,
@@ -84,13 +90,21 @@ export default async function RegisterPage({
         ← {course.title}
       </Link>
 
-      <h1 className="mt-4 text-3xl">{dictionary.register.title}</h1>
-      <p className="mt-3 text-muted">{dictionary.register.subtitle}</p>
+      <h1 className="mt-4 text-3xl">
+        {waitlistMode ? dictionary.register.waitlistTitle : dictionary.register.title}
+      </h1>
+      <p className="mt-3 text-muted">
+        {waitlistMode ? dictionary.register.waitlistSubtitle : dictionary.register.subtitle}
+      </p>
 
       <div className="mt-10">
         {options.length === 0 ? (
           <EmptyState
-            title={dictionary.course.noCohorts}
+            title={
+              waitlistMode
+                ? dictionary.register.errorNoWaitlistCohort
+                : dictionary.course.noCohorts
+            }
             action={
               <Button href={`/${locale}/contact`} variant="secondary">
                 {dictionary.home.heroCtaSecondary}
@@ -107,6 +121,7 @@ export default async function RegisterPage({
             cohorts={options}
             defaultCohortId={defaultCohortId}
             whatsappNumber={settings.whatsappNumber}
+            waitlist={waitlistMode}
           />
         )}
       </div>

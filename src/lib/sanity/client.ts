@@ -1,4 +1,4 @@
-import { createClient, type SanityClient } from 'next-sanity'
+import { createClient, type SanityClient } from '@sanity/client'
 import imageUrlBuilder from '@sanity/image-url'
 
 export const sanityProjectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
@@ -6,6 +6,11 @@ export const sanityDataset = process.env.NEXT_PUBLIC_SANITY_DATASET ?? 'producti
 export const sanityApiVersion = '2024-10-01'
 
 /**
+ * يُستورد العميل من `@sanity/client` لا من `next-sanity`: حزمة
+ * `next-sanity` تصدّر مكوّنات عميل للمعاينة المباشرة، واستيراد أي شيء
+ * من جذرها يسحبها كلها إلى حزمة المتصفح — قياس فعلي: ١٠٤ كيلوبايت
+ * مضغوطة تُحمَّل في كل صفحة بلا فائدة (SPEC §10.1).
+ *
  * الموقع يعمل بالكامل بلا Sanity: عند غياب الإعدادات تُقرأ البيانات من
  * المحتوى التجريبي (SPEC §12). هذا يبقي البناء والاختبارات مستقلة عن
  * خدمة خارجية، ويجعل النشر الأول ممكناً قبل تجهيز لوحة المحتوى.

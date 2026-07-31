@@ -162,7 +162,14 @@
     "errorGeneric": "Something went wrong. Please try again, or reach me on WhatsApp.",
     "errorCohortFull": "This cohort filled up while you were filling in the form. Pick another cohort or join the waitlist.",
     "errorRateLimited": "Too many requests in a short time. Please try again shortly.",
-    "errorDuplicate": "You already have a registration for this cohort with this email."
+    "errorDuplicate": "You already have a registration for this cohort with this email.",
+    "waitlistTitle": "Join the waitlist",
+    "waitlistSubtitle": "This cohort is full. Leave your details and I will contact you as soon as a seat frees up or the next cohort opens.",
+    "waitlistSubmit": "Join the waitlist",
+    "waitlistSuccessTitle": "You are on the waitlist",
+    "waitlistSuccessBody": "I will contact you as soon as a seat frees up in this cohort, or when the next one opens.",
+    "waitlistConsent": "I agree to be contacted by email and WhatsApp when a seat becomes available.",
+    "errorNoWaitlistCohort": "There is no cohort accepting waitlist entries for this course right now."
   },
   "certificates": {
     "title": "Certificates and credentials",

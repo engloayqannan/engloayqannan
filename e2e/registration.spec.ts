@@ -110,6 +110,52 @@ test.describe('التسجيل', () => {
     expect(body.whatsappSent).toBe(false)
   })
 
+  test('قائمة الانتظار تُقبل على الدفعة الممتلئة وحدها', async ({ page, request }) => {
+    await page.goto(`/ar/courses/${FULL_COURSE}`)
+
+    await page.getByRole('link', { name: 'انضم لقائمة الانتظار' }).first().click()
+    await expect(page).toHaveURL(/waitlist=1/)
+    await expect(page.getByRole('button', { name: 'انضم لقائمة الانتظار' })).toBeVisible()
+
+    const accepted = await request.post('/api/register', {
+      data: {
+        fullName: 'ريم سالم',
+        email: `reem-${Date.now()}@example.com`,
+        phone: '+962791234511',
+        courseSlug: FULL_COURSE,
+        cohortId: 'cohort-typescript-1',
+        preferredMode: 'online',
+        experienceLevel: 'beginner',
+        registrationType: 'individual',
+        consent: true,
+        waitlist: true,
+        locale: 'ar',
+      },
+    })
+
+    expect(accepted.ok()).toBe(true)
+    expect((await accepted.json()).waitlist).toBe(true)
+
+    // الدفعة المفتوحة تُسجَّل مباشرة ولا تُقبل كقائمة انتظار
+    const rejected = await request.post('/api/register', {
+      data: {
+        fullName: 'ريم سالم',
+        email: `reem-open-${Date.now()}@example.com`,
+        phone: '+962791234512',
+        courseSlug: OPEN_COURSE,
+        cohortId: 'cohort-react-1',
+        preferredMode: 'online',
+        experienceLevel: 'beginner',
+        registrationType: 'individual',
+        consent: true,
+        waitlist: true,
+        locale: 'ar',
+      },
+    })
+
+    expect(rejected.status()).toBe(409)
+  })
+
   test('يرفض الخادم طلباً ناقص التحقق برسائل مترجمة', async ({ request }) => {
     const response = await request.post('/api/register', {
       data: {

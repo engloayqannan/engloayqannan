@@ -1,15 +1,14 @@
-'use client'
-
-import * as Dialog from '@radix-ui/react-dialog'
-import Image from 'next/image'
-import { useState } from 'react'
-
 import { Badge, Card } from '@/components/ui/primitives'
 import type { Certificate } from '@/lib/content/types'
 import type { Locale } from '@/lib/i18n/config'
 import type { Dictionary } from '@/lib/i18n/dictionary'
-import { formatDate, interpolate, isVectorAsset } from '@/lib/utils/format'
+import { formatDate, interpolate } from '@/lib/utils/format'
 
+import { CertificateLightbox } from './CertificateLightbox'
+
+/**
+ * البطاقة نفسها مكوّن خادم — الجزء التفاعلي الوحيد هو عارض الصورة.
+ */
 export function CertificateCard({
   certificate,
   locale,
@@ -19,50 +18,14 @@ export function CertificateCard({
   locale: Locale
   dictionary: Dictionary
 }) {
-  const [open, setOpen] = useState(false)
-
   return (
     <Card as="li" className="flex h-full flex-col overflow-hidden">
-      <Dialog.Root open={open} onOpenChange={setOpen}>
-        <Dialog.Trigger asChild>
-          <button
-            type="button"
-            className="group block w-full bg-bg-elevated p-3 text-start"
-            aria-label={`${dictionary.certificates.viewImage}: ${certificate.title}`}
-          >
-            <Image
-              src={certificate.image.url}
-              alt={certificate.image.alt}
-              width={certificate.image.width ?? 800}
-              height={certificate.image.height ?? 566}
-              sizes="(max-width: 768px) 100vw, 33vw"
-              unoptimized={isVectorAsset(certificate.image.url)}
-              className="h-auto w-full rounded-sm transition-transform duration-250 group-hover:scale-[1.02]"
-            />
-          </button>
-        </Dialog.Trigger>
-
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm" />
-          <Dialog.Content className="fixed inset-4 z-50 flex flex-col items-center justify-center gap-4 focus:outline-none">
-            <Dialog.Title className="sr-only">{certificate.title}</Dialog.Title>
-            <Dialog.Description className="sr-only">{certificate.image.alt}</Dialog.Description>
-
-            <Image
-              src={certificate.image.url}
-              alt={certificate.image.alt}
-              width={certificate.image.width ?? 800}
-              height={certificate.image.height ?? 566}
-              unoptimized={isVectorAsset(certificate.image.url)}
-              className="max-h-[80dvh] w-auto max-w-full rounded-md bg-white"
-            />
-
-            <Dialog.Close className="rounded-sm bg-surface px-4 py-2 text-xs font-semibold text-fg">
-              {dictionary.common.close}
-            </Dialog.Close>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <CertificateLightbox
+        image={certificate.image}
+        title={certificate.title}
+        triggerLabel={dictionary.certificates.viewImage}
+        closeLabel={dictionary.common.close}
+      />
 
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div className="flex items-start justify-between gap-3">
